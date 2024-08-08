@@ -5,6 +5,7 @@ import com.example.testeffectivemobile.entity.TaskEntity;
 import com.example.testeffectivemobile.service.ServiceTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;

@@ -2,9 +2,11 @@ package com.example.testeffectivemobile.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
 
 
 @Getter
@@ -21,21 +23,30 @@ public class TaskEntity {
     private long id;
     @Column(name = "header")
     @Schema(description = "Заголовок")
+    @Size(min = 5, message = "Заголов слишком маленький")
+    @Size(max = 225, message = "Заголовок слишком большой")
     private String header;
     @Column(name = "description")
     @Schema(description = "Описание")
+    @Size(min = 5, message = "Описание слишком маленькое")
+    @Size(max = 225, message = "Описание слишком большое")
     private String description;
     @Column(name = "status")
     @Schema(description = "Статус")
+    @NotBlank(message = "Поле не может быть пустым")
     private String status;
     @Column(name = "priority")
-    @Schema(description = "Приоритет от меньшего к большему")
+    @Schema(description = "Приоритет, от меньшего к большему")
+    @Min(1)
+    @Max(10)
     private int priority;
     @Column(name = "author")
     @Schema(description = "Автор/логин пользователя", accessMode = Schema.AccessMode.READ_ONLY)
+    @Pattern(regexp = "\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*\\.\\w{2,4}",message = "Введите корректный email")
     private String author;
     @Column(name = "executor")
     @Schema(description = "Исполнитель/логин пользователя", accessMode = Schema.AccessMode.READ_ONLY)
+    @Pattern(regexp = "\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*\\.\\w{2,4}",message = "Введите корректный email")
     private String executor;
 
     public TaskEntity(String header, String description, String status, int priority, String author, String executor) {
