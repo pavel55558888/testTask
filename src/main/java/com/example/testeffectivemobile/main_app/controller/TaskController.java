@@ -15,7 +15,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Tag(name = "Контроллер главный")
 @RestController
@@ -33,7 +35,9 @@ public class TaskController {
     @Operation(summary = "Получить все таски")
     @GetMapping("/tasks")
     public List<TaskEntity> getAll(){
-        return serviceTask.getAllTask();
+        List<TaskEntity> allTask = serviceTask.getAllTask();
+        allTask = allTask.stream().sorted(Comparator.comparingDouble(TaskEntity::getPriority)).collect(Collectors.toList());
+        return allTask;
     }
 
     @Operation(summary = "Получить таски пользователей по логину/email", description = "Пользователь вводит логин/email в поле, после чего необходимо вставить его в url")

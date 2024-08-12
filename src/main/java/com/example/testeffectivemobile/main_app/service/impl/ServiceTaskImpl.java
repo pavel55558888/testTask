@@ -18,7 +18,6 @@ public class ServiceTaskImpl implements ServiceTask {
     @Override
     public List<TaskEntity> getAllTask() {
         List<TaskEntity> allTask = daoTask.getAllTask();
-        allTask = allTask.stream().sorted(Comparator.comparingDouble(TaskEntity::getPriority)).collect(Collectors.toList());
         return allTask;
     }
 
