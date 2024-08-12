@@ -1,12 +1,14 @@
 package com.example.testeffectivemobile.security.controllers;
 
 
+import com.example.testeffectivemobile.main_app.dto.DtoError;
 import com.example.testeffectivemobile.security.dto.AuthenticationDTO;
 import com.example.testeffectivemobile.security.dto.AuthenticationResponse;
 import com.example.testeffectivemobile.security.services.jwt.UserDetailsServiceImpl;
 import com.example.testeffectivemobile.security.util.JwtUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -14,6 +16,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,9 +34,16 @@ public class AuthenticationController {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
+    @Autowired
+    DtoError dtoError;
     @Schema(name = "Авторизация", description = "Необходимо в теле запроса отправить логин и пароль")
     @PostMapping("/authenticate")
-    public AuthenticationResponse createAuthenticationToken(@RequestBody AuthenticationDTO authenticationDTO, HttpServletResponse response) throws BadCredentialsException, DisabledException, UsernameNotFoundException, IOException {
+    public <T> T createAuthenticationToken(@Valid @RequestBody AuthenticationDTO authenticationDTO, BindingResult bindingResult, HttpServletResponse response) throws BadCredentialsException, DisabledException, UsernameNotFoundException, IOException {
+        if (bindingResult.hasErrors()){
+            dtoError.setListError(bindingResult.getAllErrors());
+            return (T) dtoError;
+        }
+
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationDTO.getEmail(), authenticationDTO.getPassword()));
         } catch (BadCredentialsException e) {
@@ -47,7 +57,7 @@ public class AuthenticationController {
 
         final String jwt = jwtUtil.generateToken(userDetails.getUsername());
 
-        return new AuthenticationResponse(jwt);
+        return (T) new AuthenticationResponse(jwt);
 
     }
 
